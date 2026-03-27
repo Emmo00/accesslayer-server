@@ -5,6 +5,7 @@ import {
    serializeCreatorList,
    CreatorListResponse,
 } from './creators.serializers';
+import { wrapPublicCreatorListResponse } from './public-creator-list-envelope.utils';
 import { mapPublicCreatorStats } from './creators.stats';
 import {
    sendSuccess,
@@ -31,15 +32,14 @@ export const httpListCreators: AsyncController = async (req, res, next) => {
       // Fetch creators and total count
       const [creators, total] = await fetchCreatorList(validatedQuery);
 
-      // Serialize response
-      const response: CreatorListResponse = {
-         creators: serializeCreatorList(creators),
-         pagination: buildOffsetPaginationMeta({
+      const response: CreatorListResponse = wrapPublicCreatorListResponse(
+         serializeCreatorList(creators),
+         buildOffsetPaginationMeta({
             limit: validatedQuery.limit,
             offset: validatedQuery.offset,
             total,
-         }),
-      };
+         })
+      );
 
       sendSuccess(res, response);
    } catch (error) {
