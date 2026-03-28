@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import {
-   CREATOR_LIST_SORT_OPTIONS,
-   CREATOR_LIST_SORT_ORDERS,
-} from './creators.sort';
+import { CREATOR_LIST_SORT_OPTIONS } from './creators.sort';
+import { creatorListSortDirectionQueryParam } from './creators.sort-direction.parse';
+import { withCreatorListQueryStringNormalization } from './creators.query-string.utils';
 import { safeIntParam } from '../../utils/query.utils';
 import {
    DEFAULT_PAGE_SIZE,
@@ -10,6 +9,7 @@ import {
    MIN_PAGE_SIZE,
    MAX_PAGE_SIZE,
 } from '../../constants/pagination.constants';
+import { DEFAULT_CREATOR_LIST_SORT } from '../../constants/creator-list-sort.constants';
 
 /**
  * Validation schema for creator list query parameters.
@@ -36,18 +36,22 @@ export const CreatorListQuerySchema = z.object({
    }),
 
    // Sorting
-   sort: z.enum(CREATOR_LIST_SORT_OPTIONS).optional().default('createdAt'),
-   order: z.enum(CREATOR_LIST_SORT_ORDERS).optional().default('desc'),
+   sort: withCreatorListQueryStringNormalization(
+      z.enum(CREATOR_LIST_SORT_OPTIONS).optional().default(DEFAULT_CREATOR_LIST_SORT)
+   ),
+   order: creatorListSortDirectionQueryParam(),
 
    // Filters
-   verified: z
-      .string()
-      .optional()
-      .transform(val => {
-         if (val === undefined) return undefined;
-         return val === 'true';
-      }),
-   search: z.string().optional(),
+   verified: withCreatorListQueryStringNormalization(
+      z
+         .string()
+         .optional()
+         .transform(val => {
+            if (val === undefined) return undefined;
+            return val === 'true';
+         })
+   ),
+   search: withCreatorListQueryStringNormalization(z.string().optional()),
 });
 
 export type CreatorListQueryType = z.infer<typeof CreatorListQuerySchema>;
