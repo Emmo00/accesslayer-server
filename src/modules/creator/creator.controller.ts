@@ -1,6 +1,5 @@
 // src/modules/creator/creator.controller.ts
-import { Request, Response, RequestHandler } from 'express';
-import { z } from 'zod';
+import { RequestHandler } from 'express';
 
 // API response helpers
 import {
@@ -13,22 +12,14 @@ import {
 // Creator service and utilities
 import { getPaginatedCreators } from './creator.service';
 import { parseCreatorSortOptions } from './creator.utils';
-import { safeIntParam } from '../../utils/query.utils';
 import { parsePublicQuery } from '../../utils/public-query-parse.utils';
 import { wrapPublicCreatorListResponse } from '../creators/public-creator-list-envelope.utils';
 import { resolveCreatorListLimit } from '../creators/creators.limit.utils';
 import { buildCreatorListRequestContext } from '../creators/creator-list-context.utils';
 import { normalizeCreatorListPage } from './creator-list-page.guard';
 
-// Pagination constants
-import {
-  MIN_PAGE_SIZE,
-  MAX_PAGE_SIZE,
-} from '../../constants/pagination.constants';
-import { PUBLIC_PAGE_PAGINATION_DEFAULTS } from '../../utils/public-list-query-defaults';
-
 // Legacy query schema
-import { CreatorListQuerySchema as LegacyCreatorQuerySchema } from '../creators/creators.schemas';
+import { LegacyCreatorQuerySchema } from '../creators/creators.schemas';
 
 // Typed Express handler
 export const listCreators: RequestHandler = async (req, res) => {
@@ -37,12 +28,8 @@ export const listCreators: RequestHandler = async (req, res) => {
     const parsed = parsePublicQuery(LegacyCreatorQuerySchema, ctx.query);
 
     if (!parsed.ok) {
-      return sendValidationError(
-        res,
-        'Invalid query parameters',
-        parsed.details
-      );
-	 }
+      return sendValidationError(res, 'Invalid query parameters', parsed.details);
+    }
 
     // Destructure once
     let { page, limit, sortBy, sortOrder } = parsed.data;
@@ -68,11 +55,6 @@ export const listCreators: RequestHandler = async (req, res) => {
     );
   } catch (error) {
     console.error('Error listing creators:', error);
-    return sendError(
-      res,
-      500,
-      ErrorCode.INTERNAL_ERROR,
-      'Failed to retrieve creators'
-    );
+    return sendError(res, 500, ErrorCode.INTERNAL_ERROR, 'Failed to retrieve creators');
   }
 };
