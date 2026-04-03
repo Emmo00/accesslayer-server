@@ -8,8 +8,7 @@ import {
   sendValidationError,
   ErrorCode,
 } from '../../utils/api-response.utils';
-
-// Creator service and utilities
+import { attachTimestampHeader } from '../../utils/timestamp-headers.utils';
 import { getPaginatedCreators } from './creator.service';
 import { parseCreatorSortOptions } from './creator.utils';
 import { parsePublicQuery } from '../../utils/public-query-parse.utils';
@@ -109,7 +108,7 @@ export const listCreators: RequestHandler = async (req, res) => {
     });
 
     const response = wrapPublicCreatorListResponse(creators, meta);
-
+    attachTimestampHeader(res);
     const filteredItems = Array.isArray(response.items)
       ? response.items.map((item) =>
           pickFields(item as Record<string, unknown>, selectedFields)
