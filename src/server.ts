@@ -4,12 +4,16 @@ import app from './app';
 import { envConfig } from './config';
 import { logger } from './utils/logger.utils';
 import { prisma } from './utils/prisma.utils';
+import { verifyMigrationChecksums } from './utils/migration-checksum.utils';
 
 
 async function startServer() {
    try {
       await prisma.$connect();
       logger.info('Connected to database');
+
+      // Verify migrations on startup
+      await verifyMigrationChecksums();
 
       app.listen(envConfig.PORT, () => {
          logger.info(`Server running on port ${envConfig.PORT}`);
