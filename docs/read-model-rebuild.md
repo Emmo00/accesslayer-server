@@ -78,6 +78,22 @@ Source of truth (events / primary tables)
 
 Duration depends on DB instance size, network, and whether indexes are rebuilt inline or deferred.
 
+## Indexer replay dry-run
+
+Use the admin replay endpoint in dry-run mode to validate replay inputs without producing audit-write side effects.
+
+```bash
+curl -X POST "$API_BASE_URL/admin/indexer/replay" \
+  -H "Content-Type: application/json" \
+  -H "x-admin-id: <admin-id>" \
+  -d '{"startLedger": 123456, "dryRun": true}'
+```
+
+Notes:
+- `dryRun` defaults to `false`; omit it to run a normal replay initiation.
+- In dry-run mode, the response includes `dryRun: true` and no audit event is written.
+- `startLedger` must be a positive integer in both dry-run and normal mode.
+
 ## Rollback guidance
 
 If the rebuild produces incorrect data:

@@ -98,7 +98,7 @@ export const httpUpdateCreatorMetadata: AsyncController = async (
 
 export const httpReplayIndexerEvents: AsyncController = async (req: AdminRequest, res: Response, next) => {
   try {
-    const { startLedger } = req.body as { startLedger?: number };
+    const { startLedger, dryRun = false } = req.body as { startLedger?: number; dryRun?: boolean };
     const adminId = req.adminId;
 
     if (typeof startLedger !== 'number' || startLedger < 1) {
@@ -106,21 +106,29 @@ export const httpReplayIndexerEvents: AsyncController = async (req: AdminRequest
         { field: 'startLedger', message: 'startLedger must be a positive integer' },
       ]);
     }
+    if (typeof dryRun !== 'boolean') {
+      return sendValidationError(res, 'Invalid request body', [
+        { field: 'dryRun', message: 'dryRun must be a boolean' },
+      ]);
+    }
 
     const replayInitiated = {
       type: 'INDEXER_REPLAY_INITIATED',
       startLedger,
+      dryRun,
       initiatedBy: adminId,
       timestamp: new Date().toISOString(),
     };
 
-    await emitAuditEvent({
-      actor: adminId || 'unknown',
-      action: 'replay_indexer_events',
-      target: 'IndexerQueue',
-      targetId: String(startLedger),
-      metadata: { startLedger },
-    });
+    if (!dryRun) {
+      await emitAuditEvent({
+        actor: adminId || 'unknown',
+        action: 'replay_indexer_events',
+        target: 'IndexerQueue',
+        targetId: String(startLedger),
+        metadata: { startLedger, dryRun },
+      });
+    }
 
     sendSuccess(res, replayInitiated);
   } catch (error) {
