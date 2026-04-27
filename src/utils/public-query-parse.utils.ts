@@ -15,6 +15,10 @@ export type PublicQueryParseResult<T> =
  * This helper is intentionally small and focused:
  * - maps `ZodError` into `{ field, message }[]` for API validation responses
  * - does not add runtime behavior beyond schema parsing and error shaping
+ *
+ * For creator-specific query normalization rules (trimming, case-folding,
+ * format validation) and before/after examples, see:
+ * docs/api/creator-query-normalization.md
  */
 export function parsePublicQuery<S extends ZodTypeAny>(
    schema: S,
