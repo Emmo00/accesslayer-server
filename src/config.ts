@@ -9,6 +9,10 @@ export const envSchema = z.object({
    DATABASE_URL: z
       .string()
       .min(1, 'DATABASE_URL is required in the environment variables'),
+   APP_SECRET: z
+      .string()
+      .min(32, 'APP_SECRET should be at least 32 characters')
+      .default('accesslayer_default_development_secret_key_32_bytes_long'),
 
    GMAIL_USER: z.string(),
    GMAIL_APP_PASSWORD: z.string(),
@@ -55,6 +59,7 @@ export const envSchema = z.object({
       .number()
       .positive()
       .default(300_000), // 5 minutes
+   INDEXER_JITTER_FACTOR: z.coerce.number().min(0).max(1).default(0.1),
 });
 
 export const envConfig = envSchema.parse(process.env);
