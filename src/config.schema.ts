@@ -57,6 +57,13 @@ export const envSchema = z
       ENABLE_API_VERSION_HEADER: z.coerce.boolean().default(true),
       ENABLE_REQUEST_LOGGING: z.coerce.boolean().default(true),
 
+      APP_SECRET: z
+         .string()
+         .min(32, 'APP_SECRET should be at least 32 characters')
+         .default('accesslayer_default_development_secret_key_32_bytes_long'),
+
+      INDEXER_JITTER_FACTOR: z.coerce.number().min(0).max(1).default(0.1),
+
       // Stellar network
       STELLAR_NETWORK: z
          .enum(['testnet', 'mainnet'], {
