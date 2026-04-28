@@ -9,6 +9,7 @@ import {
    IndexerFlagsConfigError,
    runIndexerFeatureFlagsStartupCheck,
 } from './utils/indexer-flags-startup-check.utils';
+import { checkOptionalDependencies } from './utils/startup.utils';
 
 
 async function startServer() {
