@@ -359,7 +359,7 @@ describe('GET /api/v1/creators — empty feed with filter combinations', () => {
    // ── Response Envelope Stability ─────────────────────────────────────────────
 
    it('maintains consistent envelope shape across different filter combinations', async () => {
-      const testCases = [
+      const testCases: Array<Record<string, string>> = [
          {},
          { verified: 'true' },
          { search: 'test' },
